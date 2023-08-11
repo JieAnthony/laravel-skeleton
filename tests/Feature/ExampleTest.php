@@ -1,19 +1,13 @@
 <?php
 
-namespace Tests\Feature;
+it('request root', function () {
+    $response = $this->get('/');
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+    $response->assertStatus(302);
+});
 
-class ExampleTest extends TestCase
-{
-    /**
-     * A basic test example.
-     */
-    public function test_the_application_returns_a_successful_response(): void
-    {
-        $response = $this->get('/');
+it('request api', function () {
+    $response = $this->get('/api');
 
-        $response->assertStatus(200);
-    }
-}
+    $response->assertStatus(200);
+});
