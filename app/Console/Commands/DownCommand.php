@@ -52,8 +52,8 @@ class DownCommand extends LaravelDownCommand
             'retry' => $this->getRetryTime(),
             'refresh' => $this->option('refresh'),
             'secret' => $this->option('secret'),
-            'status' => (int) $this->option('status', 503),
-            'template' => json_encode(['code' => 503, 'message' => '服务暂时不可用', 'data' => null], JSON_UNESCAPED_UNICODE),
+            'status' => (int) $this->option('status'),
+            'template' => json_encode(['code' => 503, 'message' => 'service unavailable', 'data' => null], JSON_UNESCAPED_UNICODE),
         ];
     }
 }
