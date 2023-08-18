@@ -21,6 +21,8 @@
         "nunomaduro/collision": "^7.0",
         "overtrue/laravel-query-logger": "^3.1",
         "pestphp/pest": "^2.12",
+        "pestphp/pest-plugin-faker": "^2.0",
+        "pestphp/pest-plugin-laravel": "^2.2",
         "phpunit/phpunit": "^10.1"
     },
     "autoload": {

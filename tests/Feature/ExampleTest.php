@@ -1,13 +1,11 @@
 <?php
 
-it('request root', function () {
-    $response = $this->get('/');
+use function Pest\Laravel\{get};
 
-    $response->assertStatus(302);
+it('request root', function () {
+    get('/')->assertStatus(302);
 });
 
 it('request api', function () {
-    $response = $this->get('/api');
-
-    $response->assertStatus(200);
+    get('/api')->assertStatus(200);
 });
