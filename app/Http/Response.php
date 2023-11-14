@@ -15,22 +15,61 @@ use Illuminate\Pagination\CursorPaginator;
 
 class Response
 {
-    public function success(mixed $data = null, string $message = 'ok'): JsonResponse
+    /**
+     * @param $data
+     * @param string $message
+     * @param array $headers
+     * @return JsonResponse
+     */
+    public function success($data = null, string $message = 'ok', array $headers = []): JsonResponse
     {
-        return $this->send($data, $message, CodeEnum::SUCCESS);
+        return $this->send($data, $message, CodeEnum::SUCCESS, headers: $headers);
     }
 
-    public function fail(string $message = 'fail', CodeEnum $codeEnum = null, int $status = 200): JsonResponse
+    /**
+     * @param string $message
+     * @param int|CodeEnum|null $code
+     * @param int $status
+     * @return JsonResponse
+     */
+    public function fail(string $message = 'fail', int|CodeEnum $code = null, int $status = 200): JsonResponse
     {
-        return $this->send(null, $message, $codeEnum ?: CodeEnum::FAIL, $status);
+        return $this->send(null, $message, $code ?: CodeEnum::FAIL, $status);
     }
 
-    public function send(mixed $data, string $message, CodeEnum $codeEnum, int $status = 200)
+    /**
+     * @param mixed $data
+     * @param string $message
+     * @param int|CodeEnum $code
+     * @param int $status
+     * @param array $headers
+     * @return JsonResponse
+     */
+    public function send(mixed $data, string $message, int|CodeEnum $code, int $status = 200, array $headers = [])
     {
-        return new JsonResponse(['code' => $codeEnum->value, 'message' => $message, 'data' => $this->formatData($data)], $status);
+        return new JsonResponse(
+            [
+                'code' => $this->formatCode($code),
+                'message' => $message,
+                'data' => $this->formatData($data)
+            ], $status, $headers
+        );
     }
 
-    protected function formatData($data): array|object
+    /**
+     * @param int|CodeEnum $code
+     * @return int
+     */
+    protected function formatCode(int|CodeEnum $code)
+    {
+        return $code instanceof \BackedEnum ? $code->value : $code;
+    }
+
+    /**
+     * @param $data
+     * @return array|Arrayable|AbstractPaginator|mixed|mixed[]|null
+     */
+    protected function formatData($data)
     {
         return match (true) {
             $data instanceof ResourceCollection => $this->resourceCollection($data),
@@ -41,19 +80,30 @@ class Response
         };
     }
 
-    public function jsonResource(JsonResource $resource): array
+    /**
+     * @param JsonResource $resource
+     * @return mixed
+     */
+    public function jsonResource(JsonResource $resource)
     {
         return value($this->formatJsonResource(), $resource);
     }
 
-    protected function formatJsonResource(): \Closure
+    /**
+     * @return \Closure
+     */
+    protected function formatJsonResource()
     {
         return function (JsonResource $resource) {
             return array_merge_recursive($resource->resolve(request()), $resource->with(request()), $resource->additional);
         };
     }
 
-    public function paginator(AbstractPaginator|AbstractCursorPaginator|Paginator $resource): array
+    /**
+     * @param AbstractPaginator|AbstractCursorPaginator|Paginator $resource
+     * @return array
+     */
+    public function paginator(AbstractPaginator|AbstractCursorPaginator|Paginator $resource)
     {
         return [
             'items' => $resource->toArray()['data'],
@@ -61,8 +111,11 @@ class Response
         ];
     }
 
-
-    public function resourceCollection(ResourceCollection $collection): array
+    /**
+     * @param ResourceCollection $collection
+     * @return array
+     */
+    public function resourceCollection(ResourceCollection $collection)
     {
         return [
             'items' => $collection->resolve(),
@@ -71,9 +124,10 @@ class Response
     }
 
     /**
-     * Format paginator data.
+     * @param $collection
+     * @return array
      */
-    protected function formatMeta($collection): array
+    protected function formatMeta($collection)
     {
         return match (true) {
             $collection instanceof CursorPaginator => [
