@@ -12,6 +12,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",
+        "romanzipp/dto": "^2.3",
         "tucker-eric/eloquentfilter": "^3.2"
     },
     "require-dev": {

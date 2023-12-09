@@ -15,34 +15,17 @@ use Illuminate\Pagination\CursorPaginator;
 
 class Response
 {
-    /**
-     * @param $data
-     * @param string $message
-     * @param array $headers
-     * @return JsonResponse
-     */
     public function success($data = null, string $message = 'ok', array $headers = []): JsonResponse
     {
         return $this->send($data, $message, CodeEnum::SUCCESS, headers: $headers);
     }
 
-    /**
-     * @param string $message
-     * @param int|CodeEnum|null $code
-     * @param int $status
-     * @return JsonResponse
-     */
-    public function fail(string $message = 'fail', int|CodeEnum $code = null, int $status = 200): JsonResponse
+    public function fail(string $message = 'fail', int|CodeEnum|null $code = null, int $status = 200): JsonResponse
     {
         return $this->send(null, $message, $code ?: CodeEnum::FAIL, $status);
     }
 
     /**
-     * @param mixed $data
-     * @param string $message
-     * @param int|CodeEnum $code
-     * @param int $status
-     * @param array $headers
      * @return JsonResponse
      */
     public function send(mixed $data, string $message, int|CodeEnum $code, int $status = 200, array $headers = [])
@@ -51,13 +34,12 @@ class Response
             [
                 'code' => $this->formatCode($code),
                 'message' => $message,
-                'data' => $this->formatData($data)
+                'data' => $this->formatData($data),
             ], $status, $headers
         );
     }
 
     /**
-     * @param int|CodeEnum $code
      * @return int
      */
     protected function formatCode(int|CodeEnum $code)
@@ -66,7 +48,6 @@ class Response
     }
 
     /**
-     * @param $data
      * @return array|Arrayable|AbstractPaginator|mixed|mixed[]|null
      */
     protected function formatData($data)
@@ -81,7 +62,6 @@ class Response
     }
 
     /**
-     * @param JsonResource $resource
      * @return mixed
      */
     public function jsonResource(JsonResource $resource)
@@ -100,7 +80,6 @@ class Response
     }
 
     /**
-     * @param AbstractPaginator|AbstractCursorPaginator|Paginator $resource
      * @return array
      */
     public function paginator(AbstractPaginator|AbstractCursorPaginator|Paginator $resource)
@@ -112,7 +91,6 @@ class Response
     }
 
     /**
-     * @param ResourceCollection $collection
      * @return array
      */
     public function resourceCollection(ResourceCollection $collection)
@@ -124,7 +102,6 @@ class Response
     }
 
     /**
-     * @param $collection
      * @return array
      */
     protected function formatMeta($collection)

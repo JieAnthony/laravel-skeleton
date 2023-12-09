@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 abstract class Model extends EloquentModel
 {
-    use HasFactory, HasDateTimeFormatterTrait;
+    use HasDateTimeFormatterTrait, HasFactory;
 }
