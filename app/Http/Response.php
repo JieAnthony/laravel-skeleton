@@ -85,7 +85,7 @@ class Response
     public function paginator(AbstractPaginator|AbstractCursorPaginator|Paginator $resource)
     {
         return [
-            'items' => $resource->toArray()['data'],
+            'items' => $resource->items(),
             'pagination' => $this->formatMeta($resource),
         ];
     }
@@ -102,7 +102,7 @@ class Response
     }
 
     /**
-     * @return array
+     * @return array|null
      */
     protected function formatMeta($collection)
     {
@@ -124,7 +124,7 @@ class Response
                 'per_page' => $collection->perPage(),
                 'current_page' => $collection->currentPage(),
             ],
-            default => [],
+            default => null,
         };
     }
 }
