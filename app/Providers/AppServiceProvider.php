@@ -12,7 +12,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(Response::class, fn () => new Response);
+        //
     }
 
     /**
@@ -20,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if (! $this->app->runningInConsole()) {
+            $this->app->singleton(Response::class, fn () => new Response);
+        }
     }
 }

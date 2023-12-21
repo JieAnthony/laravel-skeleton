@@ -18,3 +18,5 @@ yarn-error.log
 /.idea
 /.vscode
 app/Console/Commands/TestCommand.php
+_ide_helper.php
+.phpstorm.meta.php

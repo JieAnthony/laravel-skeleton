@@ -43,6 +43,14 @@ class Handler extends ExceptionHandler
         });
     }
 
+    /**
+     * Render an exception into an HTTP response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @throws \Throwable
+     */
     protected function renderExceptionResponse($request, Throwable $e)
     {
         $code = $this->isHttpException($e) ? $e->getStatusCode() : 500;
@@ -55,6 +63,11 @@ class Handler extends ExceptionHandler
         );
     }
 
+    /**
+     * Convert the given exception to an array.
+     *
+     * @return array
+     */
     protected function convertExceptionToArray(Throwable $e)
     {
         return config('app.debug') ? [
