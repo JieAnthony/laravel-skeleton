@@ -15,7 +15,7 @@ use Illuminate\Pagination\CursorPaginator;
 
 class Response
 {
-    public function success($data = null, string $message = 'ok', array $headers = []): JsonResponse
+    public function success(mixed $data = null, string $message = 'ok', array $headers = []): JsonResponse
     {
         return $this->send($data, $message, CodeEnum::SUCCESS, headers: $headers);
     }
@@ -56,7 +56,7 @@ class Response
             $data instanceof ResourceCollection => $this->resourceCollection($data),
             $data instanceof JsonResource => $this->jsonResource($data),
             $data instanceof AbstractPaginator || $data instanceof AbstractCursorPaginator => $this->paginator($data),
-            $data instanceof Arrayable || (is_object($data) && method_exists($data, 'toArray')) => $data->toArray(),
+            $data instanceof Arrayable || (\is_object($data) && \method_exists($data, 'toArray')) => $data->toArray(),
             default => $data
         };
     }
@@ -75,7 +75,7 @@ class Response
     protected function formatJsonResource()
     {
         return function (JsonResource $resource) {
-            return array_merge_recursive($resource->resolve(request()), $resource->with(request()), $resource->additional);
+            return \array_merge_recursive($resource->resolve(request()), $resource->with(request()), $resource->additional);
         };
     }
 
@@ -108,10 +108,10 @@ class Response
     {
         return match (true) {
             $collection instanceof CursorPaginator => [
-                'current' => $collection->cursor()?->encode(),
-                'prev' => $collection->previousCursor()?->encode(),
-                'next' => $collection->nextCursor()?->encode(),
-                'count' => count($collection->items()),
+                'current' => $collection->cursor()->encode(),
+                'prev' => $collection->previousCursor()->encode(),
+                'next' => $collection->nextCursor()->encode(),
+                'count' => \count($collection->items()),
             ],
             $collection instanceof LengthAwarePaginator => [
                 'count' => $collection->lastItem(),
