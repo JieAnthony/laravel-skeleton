@@ -25,10 +25,7 @@ class Response
         return $this->send(null, $message, $code ?: CodeEnum::FAIL, $status);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function send(mixed $data, string $message, int|CodeEnum $code, int $status = 200, array $headers = [])
+    public function send(mixed $data, string $message, int|CodeEnum $code, int $status = 200, array $headers = []): JsonResponse
     {
         return new JsonResponse(
             [
@@ -75,7 +72,7 @@ class Response
     protected function formatJsonResource()
     {
         return function (JsonResource $resource) {
-            return \array_merge_recursive($resource->resolve(request()), $resource->with(request()), $resource->additional);
+            return \array_merge_recursive($resource->resolve(), $resource->additional);
         };
     }
 
@@ -95,10 +92,16 @@ class Response
      */
     public function resourceCollection(ResourceCollection $collection)
     {
-        return [
+        $result = [
             'items' => $collection->resolve(),
             'pagination' => $this->formatMeta($collection->resource),
         ];
+
+        if ($collection->additional) {
+            $result['additional'] = $collection->additional;
+        }
+
+        return $result;
     }
 
     /**
