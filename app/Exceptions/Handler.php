@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Traits\ResponseTrait;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
@@ -29,13 +30,6 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         /**
-         * 响应 表单验证错误
-         */
-        $this->renderable(function (ValidationException $e) {
-            return $this->response()->fail($e->validator->errors()->first(), 422);
-        });
-
-        /**
          * 上错 未知错误
          */
         $this->reportable(function (Throwable $e) {
@@ -55,12 +49,7 @@ class Handler extends ExceptionHandler
     {
         $code = $this->isHttpException($e) ? $e->getStatusCode() : 500;
 
-        return $this->response()->send(
-            $this->convertExceptionToArray($e),
-            $e->getMessage(),
-            $code,
-            $code
-        );
+        return $this->response()->send($this->convertExceptionToArray($e), $e->getMessage(), $code, $code);
     }
 
     /**
@@ -76,5 +65,27 @@ class Handler extends ExceptionHandler
             'line' => $e->getLine(),
             'trace' => collect($e->getTrace())->map(fn ($trace) => Arr::except($trace, ['args']))->all(),
         ] : null;
+    }
+
+    /**
+     * Convert an authentication exception into a response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+     */
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        return $this->response()->fail($exception->getMessage(), 401, 401);
+    }
+
+    /**
+     * Create a response object from the given validation exception.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function convertValidationExceptionToResponse(ValidationException $e, $request)
+    {
+        return $this->response()->fail($e->validator->errors()->first(), $e->status);
     }
 }
