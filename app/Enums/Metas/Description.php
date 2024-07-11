@@ -6,6 +6,4 @@ use Attribute;
 use BiiiiiigMonster\LaravelEnum\Concerns\Meta;
 
 #[Attribute]
-class Description extends Meta
-{
-}
+class Description extends Meta {}

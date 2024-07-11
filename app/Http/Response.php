@@ -9,9 +9,12 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Response as LaravelResponse;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class Response
 {
@@ -25,28 +28,41 @@ class Response
         return $this->send(null, $message, $code ?: CodeEnum::FAIL, $status);
     }
 
+    public function error(string $message, int $status = 500, mixed $data = null)
+    {
+        return $this->send($data, $message, $status, $status);
+    }
+
     public function send(mixed $data, string $message, int|CodeEnum $code, int $status = 200, array $headers = []): JsonResponse
     {
         return new JsonResponse(
-            [
-                'code' => $this->formatCode($code),
-                'message' => $message,
-                'data' => $this->formatData($data),
-            ], $status, $headers
+            ['code' => $this->formatCode($code), 'message' => $message, 'data' => $this->formatData($data)],
+            $status,
+            $headers
         );
     }
 
-    /**
-     * @return int
-     */
+    public function noContent()
+    {
+        return new LaravelResponse(status: 204);
+    }
+
+    public function download($file, ?string $name = null, array $headers = [], string $disposition = 'attachment')
+    {
+        $response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
+
+        if (! \is_null($name)) {
+            return $response->setContentDisposition($disposition, $name, \str_replace('%', '', Str::ascii($name)));
+        }
+
+        return $response;
+    }
+
     protected function formatCode(int|CodeEnum $code)
     {
         return $code instanceof \BackedEnum ? $code->value : $code;
     }
 
-    /**
-     * @return array|Arrayable|AbstractPaginator|mixed|mixed[]|null
-     */
     protected function formatData($data)
     {
         return match (true) {
@@ -58,17 +74,11 @@ class Response
         };
     }
 
-    /**
-     * @return mixed
-     */
     public function jsonResource(JsonResource $resource)
     {
         return value($this->formatJsonResource(), $resource);
     }
 
-    /**
-     * @return \Closure
-     */
     protected function formatJsonResource()
     {
         return function (JsonResource $resource) {
@@ -76,9 +86,6 @@ class Response
         };
     }
 
-    /**
-     * @return array
-     */
     public function paginator(AbstractPaginator|AbstractCursorPaginator|Paginator $resource)
     {
         return [
@@ -87,9 +94,6 @@ class Response
         ];
     }
 
-    /**
-     * @return array
-     */
     public function resourceCollection(ResourceCollection $collection)
     {
         $result = [
@@ -104,30 +108,34 @@ class Response
         return $result;
     }
 
-    /**
-     * @return array|null
-     */
     protected function formatMeta($collection)
     {
-        return match (true) {
-            $collection instanceof CursorPaginator => [
-                'current' => $collection->cursor()->encode(),
-                'prev' => $collection->previousCursor()->encode(),
-                'next' => $collection->nextCursor()->encode(),
-                'count' => \count($collection->items()),
-            ],
-            $collection instanceof LengthAwarePaginator => [
-                'count' => $collection->lastItem(),
+        if ($collection instanceof LengthAwarePaginator) {
+            return [
                 'per_page' => $collection->perPage(),
                 'current_page' => $collection->currentPage(),
                 'total' => $collection->total(),
-            ],
-            $collection instanceof Paginator => [
-                'count' => $collection->lastItem(),
+                // 'count' => $collection->lastItem(),
+            ];
+        }
+
+        if ($collection instanceof Paginator) {
+            return [
                 'per_page' => $collection->perPage(),
                 'current_page' => $collection->currentPage(),
-            ],
-            default => null,
-        };
+                // 'count' => $collection->lastItem(),
+            ];
+        }
+
+        if ($collection instanceof CursorPaginator) {
+            return [
+                'current' => $collection->cursor()->encode(),
+                'prev' => $collection->previousCursor()->encode(),
+                'next' => $collection->nextCursor()->encode(),
+                // 'count' => \count($collection->items()),
+            ];
+        }
+
+        return null;
     }
 }
