@@ -29,7 +29,7 @@ class DownCommand extends LaravelDownCommand
                 file_get_contents(base_path('/stubs/maintenance-mode.stub'))
             );
 
-            $this->laravel->get('events')->dispatch(new MaintenanceModeEnabled());
+            $this->laravel->get('events')->dispatch(new MaintenanceModeEnabled);
 
             $this->components->info('Application is now in maintenance mode.');
         } catch (Exception $e) {

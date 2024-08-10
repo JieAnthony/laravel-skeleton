@@ -3,7 +3,6 @@
 use App\Http\Response;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
-use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -18,26 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::redirect('/', '/api');
         }
     )
-    ->withMiddleware(function (Middleware $middleware) {
-
-        // 全局中间件
-        $middleware->use([
-            // \Illuminate\Http\Middleware\TrustHosts::class,
-            // \Illuminate\Http\Middleware\TrustProxies::class,
-            \Illuminate\Http\Middleware\HandleCors::class,
-            // \Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance::class,
-            // \Illuminate\Http\Middleware\ValidatePostSize::class,
-            // \Illuminate\Foundation\Http\Middleware\TrimStrings::class,
-            // \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-        ]);
-
-        $middleware->api(
-            remove: [
-                \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            ]
-        );
-
-    })
     ->withExceptions(function (Exceptions $exceptions) {
 
         // 不报告的异常
