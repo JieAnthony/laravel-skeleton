@@ -3,9 +3,8 @@
 namespace App\Exceptions;
 
 use App\Traits\ResponseTrait;
-use Exception;
 
-class BusinessException extends Exception
+class BusinessException extends \Exception
 {
     use ResponseTrait;
 

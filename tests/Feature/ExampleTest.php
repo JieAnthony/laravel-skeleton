@@ -1,6 +1,6 @@
 <?php
 
-use function Pest\Laravel\{get};
+use function Pest\Laravel\get;
 
 it('request root', function () {
     get('/')->assertStatus(302);

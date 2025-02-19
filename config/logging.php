@@ -130,14 +130,14 @@ return [
         'sql' => [
             'driver' => 'daily',
             'path' => storage_path('logs/sql/sql.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'days' => env('LOG_DAILY_DAYS', 14),
+            'level' => 'debug',
+            'days' => 14,
             'replace_placeholders' => true,
         ],
     ],
 
     'query' => [
-        'enabled' => env('APP_DEBUG'),
+        'enabled' => env('APP_DEBUG', false),
 
         // Only record queries that are slower than the following time
         // Unit: milliseconds

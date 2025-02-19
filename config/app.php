@@ -144,7 +144,6 @@ return [
         \Illuminate\Mail\MailServiceProvider::class,
         \Illuminate\Auth\Passwords\PasswordResetServiceProvider::class,
         \Illuminate\Session\SessionServiceProvider::class,
-        \Illuminate\View\ViewServiceProvider::class,
         \Illuminate\Broadcasting\BroadcastServiceProvider::class,
     ])->toArray(),
 
@@ -166,7 +165,6 @@ return [
         'Js',
         'Mail',
         'Session',
-        'View',
         'Vite',
         'Password',
         'Broadcast',

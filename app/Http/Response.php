@@ -9,12 +9,9 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Http\Response as LaravelResponse;
 use Illuminate\Pagination\AbstractCursorPaginator;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\CursorPaginator;
-use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class Response
 {
@@ -23,9 +20,9 @@ class Response
         return $this->send($data, $message, CodeEnum::SUCCESS, headers: $headers);
     }
 
-    public function fail(string $message = 'fail', int|CodeEnum|null $code = null, int $status = 200): JsonResponse
+    public function fail(string $message = 'fail', int|CodeEnum|null $code = null, int $status = 200, mixed $data = null): JsonResponse
     {
-        return $this->send(null, $message, $code ?: CodeEnum::FAIL, $status);
+        return $this->send($data, $message, $code ?: CodeEnum::FAIL, $status);
     }
 
     public function error(string $message, int $status = 500, mixed $data = null)
@@ -40,22 +37,6 @@ class Response
             $status,
             $headers
         );
-    }
-
-    public function noContent()
-    {
-        return new LaravelResponse(status: 204);
-    }
-
-    public function download($file, ?string $name = null, array $headers = [], string $disposition = 'attachment')
-    {
-        $response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
-
-        if (! \is_null($name)) {
-            return $response->setContentDisposition($disposition, $name, \str_replace('%', '', Str::ascii($name)));
-        }
-
-        return $response;
     }
 
     protected function formatCode(int|CodeEnum $code)

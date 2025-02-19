@@ -9,5 +9,5 @@ use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 abstract class Model extends EloquentModel
 {
-    use Filterable, HasDateTimeFormatterTrait,HasFactory;
+    use Filterable, HasDateTimeFormatterTrait, HasFactory;
 }
